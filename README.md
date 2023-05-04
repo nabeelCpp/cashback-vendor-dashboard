@@ -1,2 +1,2 @@
-# cashback-vendor-dashboard
-Cashback forever vendor dashboard
+# cashback-user-panel
+User dashboard of the cashbackwebsite 
