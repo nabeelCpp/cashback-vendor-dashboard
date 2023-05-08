@@ -76,7 +76,7 @@ const AuthProvider = ({ children }) => {
     // cb({ success: true })
     // router.replace('/dashboard')
 
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, {email: params.email, password: params.password}).then(resp => {
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/login`, {email: params.email, password: params.password}).then(resp => {
       let response = resp.data.data;
       // console.log(response);
       const user = { id: response.id, username: response.username, email: response.email, name: `${response.first_name} ${response.last_name}`, role: 'ADMIN' }

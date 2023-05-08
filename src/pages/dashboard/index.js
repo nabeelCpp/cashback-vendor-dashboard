@@ -17,110 +17,35 @@ import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import auth from 'src/configs/auth'
 
-// end 
+// end
 const Dashboard = () => {
-  var [data, setData] = useState([]);
+  var [data, setData] = useState([])
   // by nabeel
-  let loadData =  () => {
-    
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/userpanel`, {
+  let loadData = () => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel`, {
         headers: {
-          "Authorization": `Bearer ${localStorage.accessToken}`
+          Authorization: `Bearer ${localStorage.accessToken}`
         }
-      }).then(response => {
-        setData(response.data);
-      }).catch(error => {
-       
-        toast.error(`${error.response.status}: ${error.response.data.message}`);
-        // if(error.response.status == 401){
-        //   auth.logout();
-        // }
-      });
-    
+      })
+      .then(response => {
+        setData(response.data)
+      })
+      .catch(error => {
+        toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+      })
   }
-
 
   useEffect(() => {
     loadData()
-  }, []
-  );
+  }, [])
   // end
   return (
     <div>
-      <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-        <CardContent>
-          <Typography variant='p'>
-            Referral Link: <a className='btn btn-light' href={process.env.NEXT_PUBLIC_BASE_URL+'userpanel/register?referral='+data.referralLink!=undefined && data.referralLink||''}>{process.env.NEXT_PUBLIC_BASE_URL}userpanel/register?referral={data.referralLink!=undefined && data.referralLink||''}</a>
-          </Typography>
-          <link></link>
-        </CardContent>
-      </Card>
-
-      <Grid container spacing={6} className='match-height' sx={{ position: 'relative', mb: 7 }}>
-        <Grid item xs={12} md={4}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                Capping
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
-
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {/* {new Intl.NumberFormat(process.env.NEXT_PUBLIC_LANG, { style: 'currency', currency:  process.env.NEXT_PUBLIC_CURRENCY}).format(data.capping)} 
-                 */}
-                 {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.capping)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={6} md={12} className='match-height' sx={{ position: 'relative', mb: 7 }}>
-        <Grid item xs={12} md={12}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <div sx={{ display: 'flex' }}>
-                <Typography component='div' variant='p' sx={{ fontWeight: 'bold', mb: 10 }}>
-                  Your Monthly Target Meter
-                  <Avatar sx={{ width: 'auto', mt: 5 }} variant='rounded'>
-                    {data.monthlyTargetMeterPercentage?.toFixed(2)}%
-                  </Avatar>
-                </Typography>
-              </div>
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                Monthly Target: {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(0)} -  {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.monthlyTarget)}
-              </Typography>
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                Monthly Purchase: {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.currentMonthSale)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <div sx={{ display: 'flex' }}>
-                <Typography component='div' variant='p' sx={{ fontWeight: 'bold', mb: 10 }}>
-                  Your Annual Target Meter
-                  <Avatar sx={{ width: 'auto', mt: 5 }} variant='rounded'>
-                    {data.annualTargetMeterPercentage?.toFixed(2)} %
-                  </Avatar>
-                </Typography>
-              </div>
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                Annual Target: {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(0)} - {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.anualTarget)}
-              </Typography>
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                Annual Purchase: {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalSale)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <h2>VENDOR PANEL</h2>
 
       <Grid container spacing={2} className='match-height'>
         <Grid item xs={12} md={3}>
@@ -131,12 +56,12 @@ const Dashboard = () => {
                 variant='p'
                 sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
               >
-                Level Earning
+                SALE (CURRENT MONTH)
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalIncome)}
+                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalEarning)}
               </Typography>
             </CardContent>
           </Card>
@@ -149,12 +74,12 @@ const Dashboard = () => {
                 variant='p'
                 sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
               >
-                Income Wallet
+                ALL INVOICES
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.walletAmount)}
+                {data.allInvoices}
               </Typography>
             </CardContent>
           </Card>
@@ -167,12 +92,12 @@ const Dashboard = () => {
                 variant='p'
                 sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
               >
-                Purchase(Current month)
+                DUE AMOUNT (SAR)
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.currentMonthSale)}
+                  {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.dueAmount)} Pay Dues
               </Typography>
             </CardContent>
           </Card>
@@ -185,106 +110,79 @@ const Dashboard = () => {
                 variant='p'
                 sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
               >
-                Target(Current month)
+                TOTAL CREDIT LIMIT (SAR)
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
               <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.monthlyTarget)}
+                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.creditLimit?data.creditLimit.total:0)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
+            <CardContent>
+              <Typography
+                component='div'
+                variant='p'
+                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
+              >
+                REST CREDIT LIMIT (SAR)
+                <Avatar sx={{}} variant='rounded'></Avatar>
+              </Typography>
+
+              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
+                  {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.creditLimit?data.creditLimit.rest:0)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
+            <CardContent>
+              <Typography
+                component='div'
+                variant='p'
+                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
+              >
+                COMMISSION PERCENT (%)
+                <Avatar sx={{}} variant='rounded'></Avatar>
+              </Typography>
+
+              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
+                {data.commissionPercent}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{ mt: 5 }} className='match-height'>
-        <Grid item xs={12} md={3}>
+      <Grid container spacing={6} md={12} className='match-height' sx={{ position: 'relative', mt: 7 }}>
+        <Grid item xs={12} md={12}>
           <Card component='div' sx={{ position: 'relative', mb: 7 }}>
             <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                Co-founder Income
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
+              <div sx={{ display: 'flex' }}>
+                <Typography component='div' variant='p' sx={{ fontWeight: 'bold', mb: 10 }}>
+                  PERSONAL INFORMATION
+                </Typography>
+              </div>
 
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalCofounderIncome)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalSale)}
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
-
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                TOTAL PURCHASE
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.totalIncome)}
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
-
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                TOTAL INCOME
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                {data.total_downline}
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
-
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                TOTAL DOWNLINE
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card component='div' sx={{ position: 'relative', mb: 7 }}>
-            <CardContent>
-              <Typography
-                component='div'
-                variant='p'
-                sx={{ fontWeight: 'bold', mb: 10, display: 'flex', justifyContent: 'space-between' }}
-              >
-                {data.direct_downline}
-                <Avatar sx={{}} variant='rounded'></Avatar>
-              </Typography>
-
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                TOTAL DIRECT
-              </Typography>
+              <div sx={{  }}>
+                <Avatar sx={{ width: 100, height: 100,mb:7 }}></Avatar>
+                <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
+                  {data.profile?data.profile.first_name+' '+data.profile.last_name:''}
+                </Typography>
+                <Typography component='div' variant='p' sx={{ }}>
+                  @{data.profile?data.profile.username:''}
+                </Typography>
+                <Typography component='div' variant='p' sx={{  }}>
+                  {data.profile?`${data.profile.state}, ${data.profile.city}`:''}
+                </Typography>
+                <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
+                Stockist Package :
+                </Typography>
+              </div>
             </CardContent>
           </Card>
         </Grid>
