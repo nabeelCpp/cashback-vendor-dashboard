@@ -9,7 +9,10 @@ import axios from 'axios'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { toast } from 'react-hot-toast'
+import { useAuth } from 'src/hooks/useAuth'
 const Profile = () => {
+  const auth = useAuth()
   const [profile, setProfile] = useState([])
   const [companyregno, setCompanyregno] = useState("")
   const [username, setUsername] = useState("")
@@ -83,6 +86,67 @@ const Profile = () => {
   console.log(dataToUpdate);
   }
 
+  const updateProfile = () => {
+    let dataToUpdate = {
+      "company_reg_no": companyregno,
+      "first_name": firstname,
+      "email": email,
+      "address" : address,
+      "lendmark": lendmark,
+      // "country": country,
+      "state" : "Punjab",
+      "city": "Attock",
+      "phonecode": phonecode,
+      "telephone" : telephone,
+      "description": description
+    }
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/profile/update`,dataToUpdate, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(resp => {
+      let data = resp.data
+      if(data.success){
+        toast.success(data.message);
+      }else{
+        toast.error(data.message)
+      }
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+    });
+    
+  }
+
+  const updateBankInfo = ()  => {
+    let dataToUpdate = {
+        "acc_name" : accountName,
+        "ac_no" : accountNo,
+        "bank_nm" : bankName,
+        "branch_nm" : branchName,
+        "swift_code" : swiftCode
+    }
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/bank/update`,dataToUpdate, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(resp => {
+      let data = resp.data
+      if(data.success){
+        toast.success(data.message);
+      }else{
+        toast.error(data.message)
+      }
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+    });
+  }
+
   return (
     <>
     <Grid container spacing={6}>
@@ -130,13 +194,18 @@ const Profile = () => {
         <TextField xs={6} onChange={e => setLendmark(e.target.value)} value={lendmark} fullWidth label='Landmark:' placeholder='Landmark:' />
       </Grid>
       <Grid item md={6} xs={12}>
-        <TextField xs={6} onChange={e => setPhonecode(e.target.value)} value={phonecode} fullWidth label='Country Code:' placeholder='Country Code:' disabled />
+        <TextField xs={6} onChange={e => setPhonecode(e.target.value)} value={phonecode} fullWidth label='Country Code:' placeholder='Country Code:' type="number" />
       </Grid>
       <Grid item md={6} xs={12}>
         <TextField xs={6} onChange={e => setTelephone(e.target.value)} value={telephone} fullWidth label='Contact Number:' placeholder='Contact Number:' />
       </Grid>
       <Grid item  xs={12}>
         <TextField xs={6} onChange={e => setDescription(e.target.value)} value={description} fullWidth label='Profile Description:' placeholder='Profile Description:' multiline />
+      </Grid>
+      <Grid item md={6} xs={12}>
+        <Button variant='contained' onClick={updateProfile} sx={{ mr: 2 }}>
+          Update Profile
+        </Button>
       </Grid>
 
 
@@ -176,6 +245,12 @@ const Profile = () => {
       </Grid>
       <Grid item xs={12}>
         <TextField xs={6} onChange={e => setSwiftCode(e.target.value)} value={swiftCode} fullWidth label='Swift Code' placeholder='Swift Code' />
+      </Grid>
+
+      <Grid item md={6} xs={12}>
+        <Button variant='contained' onClick={updateBankInfo} sx={{ mr: 2 }}>
+          Update Bank Info
+        </Button>
       </Grid>
 
 

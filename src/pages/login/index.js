@@ -187,7 +187,6 @@ const LoginPage = () => {
               <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
             </Box>
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
-              <RoleSelect role={role} setRole={setRole} />
               <Divider />
               <FormControl fullWidth sx={{ my: 4 }}>
                 <Controller

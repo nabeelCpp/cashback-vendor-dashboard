@@ -24,6 +24,7 @@ import Icon from 'src/@core/components/icon'
 import useBgColor from 'src/@core/hooks/useBgColor'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
+import { useAuth } from 'src/hooks/useAuth'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -38,6 +39,7 @@ const productsArr = [];
   
 
 const OpenTicket = props => {
+  const auth = useAuth()
   const router = useRouter()
   // get categories
   const [userId, setUserId] = useState("");

@@ -3,7 +3,9 @@ import Card from '@mui/material/Card'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
+import { useAuth } from 'src/hooks/useAuth'
 const DueRequest = () => {
+  const auth = useAuth()
   const [history, setHistory] = useState([])
   const loadData = () => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/dues/report`, {
