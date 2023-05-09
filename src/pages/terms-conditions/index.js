@@ -9,7 +9,10 @@ import axios from 'axios'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { useAuth } from 'src/hooks/useAuth'
+import { toast } from 'react-hot-toast'
 const Profile = () => {
+  const auth = useAuth()
 
   const [data, setData] = useState([])
   const loadData = () => {

@@ -19,6 +19,7 @@ import auth from 'src/configs/auth'
 
 // end
 const Dashboard = () => {
+  const auth = useAuth()
   var [data, setData] = useState([])
   // by nabeel
   let loadData = () => {
