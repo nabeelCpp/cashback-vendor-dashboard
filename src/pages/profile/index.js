@@ -11,6 +11,9 @@ import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { toast } from 'react-hot-toast'
 import { useAuth } from 'src/hooks/useAuth'
+
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
 const Profile = () => {
   const auth = useAuth()
   const [profile, setProfile] = useState([])
@@ -31,6 +34,10 @@ const Profile = () => {
   const [bankName, setBankName] = useState("")
   const [branchName, setBranchName] = useState("")
   const [swiftCode, setSwiftCode] = useState("")
+  const [gallery, setGallery] = useState([])
+  const [cmpLogo, setCmpLogo] = useState('')
+  const [uploadLogo, setUploadLogo] = useState(null)
+  const [uploadGallery, setUploadGallery] = useState([])
   const loadProfile = () => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/profile`, {
       headers: {
@@ -56,6 +63,8 @@ const Profile = () => {
         setBankName(user.bank_nm||"")
         setBranchName(user.branch_nm||"")
         setSwiftCode(user.swift_code||"")
+        setGallery(user.file||[])
+        setCmpLogo(user.cmp_logo||"")
         setProfile(user)
       })
       .catch(error => {
@@ -69,21 +78,66 @@ const Profile = () => {
     loadProfile()
   }, [])
 
-  const submitHandler = () => {
-    let dataToUpdate = {
-      "company_reg_no": companyregno,
-      "first_name": firstname,
-      "email": email,
-      "address" : address,
-      "lendmark": lendmark,
-      // "country": country,
-      "state" : "Punjab",
-      "city": "Attock",
-      "phonecode": "+92",
-      "telephone" : "7905929530",
-      "description": "Zomato is an Indian multinational restaurant aggregator and food delivery company founded by Deepinder Goyal and Pankaj Chaddah in 2008. Zomato provides information, menus and user-reviews of restaurants as well as food delivery options from partner resta"
+  const submitLogoHandler = () => {
+    const formData = new FormData();
+    formData.append('cmp_logo', uploadLogo);
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/logo/update`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(resp => {
+      let data = resp.data
+      if(data.success){
+        toast.success(data.message);
+      }else{
+        toast.error(data.message)
+      }
+      setCmpLogo(data.cmp_logo)
+      setUploadLogo(null);
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+    });
   }
-  console.log(dataToUpdate);
+
+  const galleryUploadHandler = () => {
+    const formData = new FormData();
+    for (let i = 0; i < uploadGallery.length; i++) {
+      formData.append('gallery[]', uploadGallery[i]);
+    }
+    console.log(formData.FileList);
+    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/gallery/update`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(resp => {
+      let data = resp.data
+      if(data.success){
+        toast.success(data.message);
+      }else{
+        toast.error(data.message)
+      }
+      setGallery(data.files)
+      setUploadGallery([]);
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+    });
+  }
+
+  const handleLogoUpload = (event) => {
+    const selectedImage = event.target.files[0];
+    setUploadLogo(selectedImage);
+  }
+
+  const handleGalleryUpload = event => {
+    setUploadGallery(event.target.files);
   }
 
   const updateProfile = () => {
@@ -259,28 +313,78 @@ const Profile = () => {
       </Grid>
        
       <Grid  item md={9} xs={12}>
+        <ImageList sx={{ width: 500, height: cmpLogo?200:40 }} cols={3} rowHeight={164}>
+          {cmpLogo?(
+            <ImageListItem key={cmpLogo}>
+              <img
+                src={`${cmpLogo}?w=164&h=164&fit=crop&auto=format`}
+                srcSet={`${cmpLogo}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                alt={cmpLogo}
+                loading="lazy"
+              />
+            </ImageListItem>
+          ):'No Logo found!'}
+        </ImageList>
       <Button variant='contained' sx={{ mr: 2 }} component='label'>
-        Upload Image
-        <input hidden accept='image/*' multiple type='file' />
-       
+        Upload Logo
+        <input hidden accept='image/*'  type='file' onChange={handleLogoUpload} />
       </Button>
-           Group 243.png have been uploaded
+      {uploadLogo &&  (
+              <ImageList sx={{ width: 500, height: 200 }} cols={3} rowHeight={164}>
+              <ImageListItem key={URL.createObjectURL(uploadLogo)}>
+              <img
+                src={`${URL.createObjectURL(uploadLogo)}`}
+                srcSet={`${URL.createObjectURL(uploadLogo)}`}
+                alt={URL.createObjectURL(uploadLogo)}
+                loading="lazy"
+              />
+            </ImageListItem>
+        </ImageList>)}
+      </Grid>
+      <Grid item md={6} xs={12}>
+        <Button variant='contained' onClick={submitLogoHandler} sx={{ mr: 2 }}>
+          Update Logo
+        </Button>
       </Grid>
       <Grid  item md={9} xs={12}>
       <h4>CHANGE PRODUCT GALLERY</h4>
       </Grid>
       
       <Grid item md={9} xs={12}>
-      <Button variant='contained' sx={{ mr: 2 }} component='label'>
-        Upload Image
-        <input hidden accept='image/*' multiple type='file' />
-       
-      </Button>
-           Group 243.png have been uploaded
+          <ImageList sx={{ width: 500, height: 200 }} cols={3} rowHeight={164}>
+            {gallery?gallery.map((item) => (
+              <ImageListItem key={item}>
+                <img
+                  src={`${item}?w=164&h=164&fit=crop&auto=format`}
+                  srcSet={`${item}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  alt={item}
+                  loading="lazy"
+                />
+              </ImageListItem>
+            )):'No gallery found!'}
+          </ImageList>
+          <Button variant='contained' sx={{ mr: 2 }} component='label'>
+            Upload Gallery Image/s
+            <input hidden accept='image/*' multiple type='file' onChange={handleGalleryUpload} />
+          </Button>
+          {/* {uploadGallery.map((file) => (
+            (
+              <ImageList sx={{ width: 500, height: 200 }} cols={3} rowHeight={164}>
+                  <ImageListItem key={URL.createObjectURL(file)}>
+                    <img
+                      src={`${URL.createObjectURL(file)}?w=164&h=164&fit=crop&auto=format`}
+                      srcSet={`${URL.createObjectURL(file)}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                      alt={URL.createObjectURL(file)}
+                      loading="lazy"
+                    />
+                  </ImageListItem>
+              </ImageList>
+          )
+          ))} */}
       </Grid>
       <Grid item md={6} xs={12}>
-        <Button variant='contained' onClick={submitHandler} sx={{ mr: 2 }}>
-          Submit
+        <Button variant='contained' onClick={galleryUploadHandler} sx={{ mr: 2 }}>
+          Update Gallery
         </Button>
       </Grid>
     </Grid>
