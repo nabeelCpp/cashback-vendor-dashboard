@@ -106,7 +106,7 @@ const Profile = () => {
   const galleryUploadHandler = () => {
     const formData = new FormData();
     for (let i = 0; i < uploadGallery.length; i++) {
-      formData.append('gallery[]', uploadGallery[i]);
+      formData.append('gallery', uploadGallery[i]);
     }
     console.log(formData.FileList);
     axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/gallery/update`, formData, {
@@ -224,7 +224,7 @@ const Profile = () => {
         </Box>
       </Grid>
       <Grid item xs={12} md={6}>
-        <TextField xs={6} onChange={e => setCompanyregno(e.target.value)} value={companyregno} fullWidth label='Company Registration Number:' placeholder='Company Registration Number::' />
+        <TextField xs={6} onChange={e => setCompanyregno(e.target.value)} value={companyregno} fullWidth label='Company Registration Number:' placeholder='Company Registration Number:' />
       </Grid>
       <Grid item md={6} xs={12}>
         <TextField xs={6} onChange={e => setFirstname(e.target.value)} value={firstname} fullWidth label='Company Name:' placeholder='Company Name:' />
