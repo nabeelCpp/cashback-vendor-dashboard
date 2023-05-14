@@ -44,7 +44,7 @@ const AllInvoices = () => {
     { field: 'view_invoice', headerName: `View Invoice`, width: 150, renderCell: params => {
       return <Link
                 href="/viewInvoices"
-                component="button"
+                
                 variant="body2"
                 onClick={ () => {
                   viewInvoice(params.row.invoice_no)
