@@ -42,8 +42,8 @@ const AllInvoices = () => {
     { field: 'net_amount', headerName: `Total Amount (${process.env.NEXT_PUBLIC_CURRENCY})`, width: 150 },
     { field: 'payment_date', headerName: `End Date`, width: 150, renderCell: params => (new Date(params.row.payment_date).toLocaleDateString()) },
     { field: 'view_invoice', headerName: `View Invoice`, width: 150, renderCell: params => {
-      return <Link
-                href="/viewInvoices"
+      return (<Link
+                href={"/viewInvoices?inv="+params.row.invoice_no}
                 
                 variant="body2"
                 onClick={ () => {
@@ -52,6 +52,7 @@ const AllInvoices = () => {
               >
                 View Invoice
               </Link>
+              )
     } },
   ]
 

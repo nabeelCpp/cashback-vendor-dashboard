@@ -4,6 +4,8 @@ import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/useAuth'
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
 const DueRequest = () => {
   const auth = useAuth()
   const [history, setHistory] = useState([])
@@ -27,6 +29,9 @@ const DueRequest = () => {
     });
 
   }
+  const openImageinNewTab = (url) => {
+    window.open(url, "_blank")
+  }
   useEffect(()=>{
     loadData();
   }, []);
@@ -34,7 +39,15 @@ const DueRequest = () => {
     { field: '', headerName: 'SN#', width: 60, renderCell: params => params.row.key + 1 },
     { field: 'name', headerName: 'Name', width: 250, renderCell: params => params.row.first_name+' '+params.row.last_name },
     { field: 'amount', headerName: `Amount (${process.env.NEXT_PUBLIC_CURRENCY})`, width: 150 },
-    { field: 'pay_proof', headerName: 'Pay Proof', width: 200 },
+    { field: 'pp', headerName: 'Pay Proof', width: 200, renderCell: (params) => {
+      return (
+        <Stack direction="row" spacing={2}>
+          <Avatar alt="Remy Sharp" src={params.row.pay_proof} onClick={()=> {
+            openImageinNewTab(params.row.pay_proof)
+          }} />
+        </Stack>
+      )
+    } },
     { field: 'payment_mode', headerName: 'Payment Mode', width: 200 },
     { field: 'posted_date', headerName: `Start Date`, width: 150, renderCell: params => (new Date(params.row.posted_date).toLocaleDateString()) },
     { field: 'admin_remark', headerName: `Remark`, width: 250 },

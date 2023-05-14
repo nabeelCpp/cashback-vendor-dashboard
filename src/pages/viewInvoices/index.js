@@ -17,6 +17,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 const ViewInvoices = () => {
+  let urlString = window.location.href
+  let paramString = urlString.split('?')[1];
+  let queryString = new URLSearchParams(paramString);
+  // const [invoiceNo, setInvoiceNo] = useState(null)
+  let invoiceNo = null;
+  for (let pair of queryString.entries()) {
+    if(pair[0] == 'inv'){
+      invoiceNo = pair[1]
+    }
+  }
   return (
     <>
       <h1 sx={{ mb: 10 }}>SUMMARY/PAYMENT</h1>
