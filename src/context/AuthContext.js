@@ -76,25 +76,38 @@ const AuthProvider = ({ children }) => {
     // cb({ success: true })
     // router.replace('/dashboard')
 
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/login`, {email: params.email, password: params.password}).then(resp => {
-      let response = resp.data.data;
-      // console.log(response);
-      const user = { id: response.id, username: response.username, email: response.email, name: `${response.first_name} ${response.last_name}`, role: 'ADMIN' }
-      window.localStorage.setItem(authConfig.storageTokenKeyName, response.accessToken)
-      localStorage.setItem('userData', JSON.stringify(user))
-      cb({ success: true })
-      router.replace('/dashboard')
-    }).catch(error => {
-      if(error.response){
-        let toastError = [];
-        if(error.response.data.errors){
-          error.response.data.errors.map(err => toastError.push(err.msg));
-        }else if(!error.response.data.success){
-          toastError.push(error.response.data.message);
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/login`, {
+        email: params.email,
+        password: params.password
+      })
+      .then(resp => {
+        let response = resp.data.data
+        // console.log(response);
+        const user = {
+          id: response.id,
+          username: response.username,
+          email: response.email,
+          name: `${response.first_name} ${response.last_name}`,
+          role: 'ADMIN'
         }
-        cb({ success: false, message: toastError.reverse() });
-      }
-    });
+        window.localStorage.setItem(authConfig.storageTokenKeyName, response.accessToken)
+        localStorage.setItem('userData', JSON.stringify(user))
+        cb({ success: true })
+        router.replace('/dashboard')
+        window.location.reload()
+      })
+      .catch(error => {
+        if (error.response) {
+          let toastError = []
+          if (error.response.data.errors) {
+            error.response.data.errors.map(err => toastError.push(err.msg))
+          } else if (!error.response.data.success) {
+            toastError.push(error.response.data.message)
+          }
+          cb({ success: false, message: toastError.reverse() })
+        }
+      })
   }
 
   const handleLogout = () => {

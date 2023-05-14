@@ -9,7 +9,7 @@ import Card from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
-
+import Link from '@mui/material/Link'
 import { useAuth } from 'src/hooks/useAuth'
 // by nabeel
 import { useEffect, useState } from 'react'
@@ -97,8 +97,9 @@ const Dashboard = () => {
                 <Avatar sx={{}} variant='rounded'></Avatar>
               </Typography>
 
-              <Typography component='div' variant='p' sx={{ fontWeight: 'bold' }}>
-                  {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.dueAmount)} Pay Dues
+              <Typography component='div' variant='p' sx={{ fontWeight: 'bold',display:"flex",justifyContent:"space-between" }}>
+                  {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.dueAmount)} 
+                  <Link href="/payDues">Pay Dues</Link>
               </Typography>
             </CardContent>
           </Card>
