@@ -43,6 +43,7 @@ const AllInvoices = () => {
     { field: 'payment_date', headerName: `End Date`, width: 150, renderCell: params => (new Date(params.row.payment_date).toLocaleDateString()) },
     { field: 'view_invoice', headerName: `View Invoice`, width: 150, renderCell: params => {
       return <Link
+                href="/viewInvoices"
                 component="button"
                 variant="body2"
                 onClick={ () => {
