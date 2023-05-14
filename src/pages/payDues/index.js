@@ -11,7 +11,9 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
+import { useRouter } from 'next/router'
 const PayDues = () => {
+  const router = useRouter()
   const [paymentMode, setPaymentMode] = useState(null)
   const [amount, setAmount] = useState(0)
   const [uploadProof, setUploadProof] = useState(null)
@@ -69,19 +71,20 @@ const PayDues = () => {
         let id = data.id
         if(data.success){
           toast.success(data.message);
+          toast.success("Please wait we are uploading proof!")
+          const formData = new FormData();
+          formData.append('payment_proof', uploadProof);
+          axios.put(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/pay-dues/${id}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              "Authorization": `Bearer ${localStorage.accessToken}`
+            }
+          }).then(response => {
+            router.replace('/due-request')
+          })
         }else{
           toast.error(data.message)
         }
-        const formData = new FormData();
-        formData.append('payment_proof', uploadProof);
-        axios.put(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/pay-dues/${id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            "Authorization": `Bearer ${localStorage.accessToken}`
-          }
-        }).then(response => {
-          Router.push('/due-request')
-        })
       }).catch(error => {
         toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
           if (error.response && error.response.status == 401) {
