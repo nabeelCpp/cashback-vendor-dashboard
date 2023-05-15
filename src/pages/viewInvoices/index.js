@@ -17,6 +17,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 const ViewInvoices = () => {
+  const [data, setData] = useState([])
   let urlString = window.location.href
   let paramString = urlString.split('?')[1];
   let queryString = new URLSearchParams(paramString);
@@ -27,6 +28,24 @@ const ViewInvoices = () => {
       invoiceNo = pair[1]
     }
   }
+
+  const loadData = () => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/invoice/view/${invoiceNo}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(response=>{
+      setData(response.data);
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+      if (error.response && error.response.status == 401) {
+        auth.logout();
+      }
+    })
+  }
+  useEffect(() => {
+    loadData()
+  }, [])
   return (
     <>
       <h1 sx={{ mb: 10 }}>SUMMARY/PAYMENT</h1>
