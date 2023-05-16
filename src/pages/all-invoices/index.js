@@ -3,7 +3,7 @@ import Card from '@mui/material/Card'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
-import Link from '@mui/material/Link';
+import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
 const AllInvoices = () => {
   const auth = useAuth()

@@ -17,16 +17,45 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 const ViewInvoices = () => {
+  const [data, setData] = useState([])
   let urlString = window.location.href
   let paramString = urlString.split('?')[1];
   let queryString = new URLSearchParams(paramString);
   // const [invoiceNo, setInvoiceNo] = useState(null)
+  const [subtotal, setSubtotal] = useState(0)
+  const [discount, setDiscount] = useState(0)
   let invoiceNo = null;
   for (let pair of queryString.entries()) {
     if(pair[0] == 'inv'){
       invoiceNo = pair[1]
     }
   }
+
+  const loadData = () => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/invoice/view/${invoiceNo}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    }).then(response=>{
+      setData(response.data);
+      let stotal = 0;
+      let disc = 0;
+      response.data.purchase_detail.map(s=>{
+        stotal += s.net_price;
+        disc += s.discount;
+      })
+      setDiscount(disc)
+      setSubtotal(stotal)
+    }).catch(error => {
+      toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+      if (error.response && error.response.status == 401) {
+        auth.logout();
+      }
+    })
+  }
+  useEffect(() => {
+    loadData()
+  }, [])
   return (
     <>
       <h1 sx={{ mb: 10 }}>SUMMARY/PAYMENT</h1>
@@ -40,7 +69,7 @@ const ViewInvoices = () => {
             PAID AMOUNT:
             <Card component='div' sx={{ position: 'relative', mb: 3, p: 5, minWidth: '250px' }}>
               {' '}
-              SAR 200.00
+              {new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.total_amount||0)} 
             </Card>
           </div>
         </Typography>
@@ -69,7 +98,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Altahir</span>
+              <span>{data.user&&data.user.first_name}</span>
             </Typography>
             <Typography
               component='div'
@@ -80,7 +109,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Bahrain</span>
+              <span>{data.user&&data.user.city?data.user.city+', ':''} {data.user&&data.user.state?data.user.state+', ':''} {data.user&&data.user.country?data.user.country:''}</span>
             </Typography>
             <Typography
               component='div'
@@ -91,7 +120,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Tel: 8956565112154</span>
+              <span>Tel: {data.user&&data.user.telephone}</span>
             </Typography>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -116,7 +145,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Invoice Number: 2265656565</span>
+              <span>Invoice Number: {data.invoice_no||''}</span>
             </Typography>
             <Typography
               component='div'
@@ -127,7 +156,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Invoice Date: 2022-05-25</span>
+              <span>Invoice Date: {data.payment_date&&new Date(data.payment_date).toLocaleDateString()}</span>
             </Typography>
             <Typography
               component='div'
@@ -138,7 +167,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Stokist ID: Emark656565</span>
+              <span>Stokist ID: {data.seller_id&&data.seller_id}</span>
             </Typography>
             <Typography
               component='div'
@@ -149,7 +178,7 @@ const ViewInvoices = () => {
                 pr: 20
               }}
             >
-              <span>Stokist Name: Zomato Ltd, zomato</span>
+              <span>Stokist Name: {data.vendor&&data.vendor.first_name?data.vendor.first_name:''} {data.vendor&&data.vendor.last_name?data.vendor.last_name:''}</span>
             </Typography>
           </Grid>
         </Grid>
@@ -166,13 +195,17 @@ const ViewInvoices = () => {
         </TableRow>
       </TableHead>
       <TableBody>
-      <TableRow>
-          <TableCell>1</TableCell>
-          <TableCell align='center' >Testing</TableCell>
-          <TableCell align='center'>100.00</TableCell>
-          <TableCell align='center'>2</TableCell>
-          <TableCell align='center'>200.00</TableCell>
-        </TableRow>
+        {data.purchase_detail&&data.purchase_detail.map((pd, key)=>{
+          return (
+            <TableRow>
+              <TableCell>{key+1}</TableCell>
+              <TableCell align='center' >{pd.product_name&&pd.product_name}</TableCell>
+              <TableCell align='center'>{pd.price&&pd.price.toFixed(2)}</TableCell>
+              <TableCell align='center'>{pd.quantity&&pd.quantity}</TableCell>
+              <TableCell align='center'>{pd.net_price&&parseInt(pd.net_price).toFixed(2)}</TableCell>
+            </TableRow>
+          )
+        })}
           
       
       </TableBody>
@@ -197,7 +230,7 @@ const ViewInvoices = () => {
               }}
             >
               <span>SubTotal:</span>
-              <span>SAR200.00</span>
+              <span>{new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(data.total_amount&&data.total_amount)} </span>
             </Typography>
             <Typography
               component='div'
@@ -212,7 +245,7 @@ const ViewInvoices = () => {
               }}
             >
               <span>Grand Total:</span>
-              <span>SAR200.00</span>
+              <span>{new Intl.NumberFormat( `${localStorage.localization}`, { style: 'currency', currency: process.env.NEXT_PUBLIC_CURRENCY }).format(subtotal&&parseInt(subtotal).toFixed(2))}</span>
             </Typography>
     
             </Card>

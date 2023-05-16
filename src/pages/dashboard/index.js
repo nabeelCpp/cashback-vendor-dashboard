@@ -9,13 +9,14 @@ import Card from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
-import Link from '@mui/material/Link'
+import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
 // by nabeel
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import auth from 'src/configs/auth'
+
 
 // end
 const Dashboard = () => {
