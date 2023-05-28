@@ -16,12 +16,7 @@ import { CacheProvider } from '@emotion/react'
 import 'src/configs/i18n'
 import { defaultACLObj } from 'src/configs/acl'
 import themeConfig from 'src/configs/themeConfig'
-// Set application language
-if (typeof window !== 'undefined') {
-  let setLang = localStorage.localization||process.env.NEXT_PUBLIC_LANG
-  console.log(process.env.NEXT_PUBLIC_LANG)
-  localStorage.setItem('localization', setLang)
-}
+
 // ** Fake-DB Import
 // import 'src/@fake-db'
 
@@ -45,7 +40,8 @@ import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsCo
 
 // ** Styled Components
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
-
+import axios from 'axios'
+import authConfig from 'src/configs/auth'
 // ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 
@@ -66,7 +62,35 @@ import 'react-image-crop/dist/ReactCrop.css'
 import '../../styles/globals.css'
 
 const clientSideEmotionCache = createEmotionCache()
+// Set application language
+if (typeof window !== 'undefined') {
+  let setLang = localStorage.localization||process.env.NEXT_PUBLIC_LANG
+  console.log(process.env.NEXT_PUBLIC_LANG)
+  localStorage.setItem('localization', setLang)
 
+  var url_string = window.location.href
+  var url = new URL(url_string)
+  if(url.searchParams.get("__sid") && url.searchParams.get("__uid")){
+    var adminToken = decodeURI(url.searchParams.get("__sid"))
+    var user_id = decodeURI(url.searchParams.get("__uid"))
+    axios
+    .get(`${process.env.NEXT_PUBLIC_API_URL}/controlpanel/vendor/login/${user_id}`, {
+      headers: {
+        Authorization: `Bearer ${adminToken}`
+      }
+    })
+    .then(resp => {
+      let response = resp.data.data;
+      const user = { id: response.id, username: response.username, email: response.email, name: `${response.first_name} ${response.last_name}`, role: 'ADMIN' }
+      window.localStorage.setItem(authConfig.storageTokenKeyName, response.accessToken)
+      localStorage.setItem('userData', JSON.stringify(user))
+      window.location.href = '/dashboard'
+    })
+    .catch(error => {
+      window.location.href = '/login'
+    })
+  }
+}
 // ** Pace Loader
 if (themeConfig.routingLoader) {
   Router.events.on('routeChangeStart', () => {
