@@ -81,7 +81,8 @@ if (typeof window !== 'undefined') {
     })
     .then(resp => {
       let response = resp.data.data;
-      const user = { id: response.id, username: response.username, email: response.email, name: `${response.first_name} ${response.last_name}`, role: 'ADMIN' }
+      const user = { id: response.id, username: response.username, email: response.email, name: `${response.first_name} ${response.last_name}`,image: response.cmp_logo, role: 'ADMIN' }
+      alert(user)
       window.localStorage.setItem(authConfig.storageTokenKeyName, response.accessToken)
       localStorage.setItem('userData', JSON.stringify(user))
       window.location.href = '/dashboard'

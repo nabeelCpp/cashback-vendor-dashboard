@@ -16,7 +16,12 @@ import DialogActions from '@mui/material/DialogActions'
 import Autocomplete from '@mui/material/Autocomplete';
 import { useRouter } from 'next/router'
 import { create } from 'src/services/client.service'
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -26,16 +31,9 @@ import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import { useAuth } from 'src/hooks/useAuth'
 
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Fade ref={ref} {...props} />
-})
-const initialvalue = {
-  name : "",
-  qty :"",
-  price : ""
-}
+import Paper from '@mui/material/Paper';
+import Link from '@mui/material/Link'
 
-const productsArr = [];
   
 
 const OpenTicket = props => {
@@ -44,10 +42,17 @@ const OpenTicket = props => {
   // get categories
   const [userId, setUserId] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
-  const [products, setProducts] = useState(initialvalue)
+  const [products, setProducts] = useState([])
+  const [productName, setProductName] = useState(null)
+  const [unitPrice, setUnitPrice] = useState(null)
+  const [quantity, setQuantity] = useState(null)
  
   
-
+  const deleteItem = (key) => {
+    console.log(products[key])
+    let arr = products.filter((r, k)  => k != key)
+    setProducts(arr)
+  }
   const submitHandler = (e) => {
     e.preventDefault()
     let errors = 0;
@@ -60,19 +65,18 @@ const OpenTicket = props => {
       errors++;
     }
 
-    if(!products){
+    if(products.length == 0){
       toast.error("Atleast 1 Product is required!");
       errors++;
     }
     
     // TODO: Add API call here
     if(!errors){
-      productsArr.push(products)
       axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/invoice/generate`,{
         user_id: userId,
         invoice_no: invoiceNo,
         current_url: "/franchisepanel/puc-generateinvoice.php",
-        products: productsArr
+        products: products
       }, {
         headers: {
           "Authorization": `Bearer ${localStorage.accessToken}`
@@ -90,24 +94,35 @@ const OpenTicket = props => {
         })
     }
   }
-  const setPName = (e)=>{
-    if(e.name == 'pqty'){
-      setProducts({...products, qty : e.value})
-    }
-    if(e.name == 'price'){
-      setProducts({...products, price : e.value})
-    }
-
-    if(e.name == 'pname'){
-      setProducts({...products, name : e.value})
-    }
-
-  }
 
   const addProductDom = () => {
-    productsArr.push(products)
-    setProducts(initialvalue);
-    console.log(productsArr);
+    let errors = false
+    if(!productName){
+      toast.error('Product name is required')
+      errors = true
+    }
+
+    if(!unitPrice){
+      toast.error('Unit price is required')
+      errors = true
+    }
+    if(!quantity){
+      toast.error('Quantity is required')
+      errors = true
+    }
+
+    if(!errors){
+      let obj = {
+        name: productName,
+        price: unitPrice,
+        qty: quantity
+      }
+      products.push(obj)
+      setProducts(products)
+      setProductName('')
+      setUnitPrice('')
+      setQuantity('')
+    }
   }
   return (
     <Grid container spacing={6}>
@@ -123,21 +138,21 @@ const OpenTicket = props => {
           }}
         >
           <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-            <Icon icon='mdi:home-outline' />
             <Typography variant='h6' sx={{ color: 'primary.main' }}>
-            INVOICE INFORMATION
+              GENERATE INVOICE
             </Typography>
           </Box>
         </Box>
       </Grid>
       
       
-      <Grid item  xs={12}>
+      <Grid item  xs={6}>
         <TextField xs={6} onChange={e => setUserId(e.target.value)} value={userId} fullWidth label='User ID:' placeholder='User ID:' />
       </Grid>
-      <Grid item  xs={12}>
+      <Grid item  xs={6}>
         <TextField xs={6} onChange={e => setInvoiceNo(e.target.value)} value={invoiceNo} fullWidth label='Invoice No:' placeholder='Invoice No:' />
       </Grid>
+
      
       <Grid item xs={12}>
         <Box
@@ -149,23 +164,64 @@ const OpenTicket = props => {
 
             border: theme => `1px solid ${theme.palette.primary.main}`
           }}
-        >
+          >
           <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', '& svg': { mr: 2 } }}>
-            <Icon icon='mdi:home-outline' />
             <Typography variant='h6' sx={{ color: 'primary.main' }}>
             ADD PRODUCT ENTRY
             </Typography>
           </Box>
         </Box>
       </Grid>
+          {products.length > 0 ?
+            <Grid item md={12} xs={12}>
+              <Box sx={{ minWidth: 120 }}>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="Services Table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>#</TableCell>
+                        <TableCell align="right">Product Name</TableCell>
+                        <TableCell align="right">Unit Price</TableCell>
+                        <TableCell align="right">Quantity</TableCell>
+                        <TableCell align="right">Total Price</TableCell>
+                        <TableCell align="right">Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {products.map((row, key) => (
+                        <TableRow
+                          key={key}
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
+                          <TableCell component="th" scope="row">
+                            {key+1}
+                          </TableCell>
+                          <TableCell align="right">{row.name}</TableCell>
+                          <TableCell align="right">{row.price}</TableCell>
+                          <TableCell align="right">{row.qty}</TableCell>
+                          <TableCell align="right">{row.qty * row.price}</TableCell>
+                          <TableCell align="right">
+                            <Grid container spacing={0}>
+                              <Grid item xs={6}>
+                                <Link href='javascript:void(0)' onClick={() => deleteItem(key)}>Delete</Link>
+                              </Grid>
+                            </Grid>
+                            </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            </Grid>:''}
       <Grid item md={4}  xs={12}>
-        <TextField xs={6} onChange={e => setPName(e.target)} name='pname' value={products.name} fullWidth label='Product Name' placeholder='Product Name' />
+        <TextField xs={6} onChange={e => setProductName(e.target.value)} name='pname' value={productName} fullWidth label='Product Name' placeholder='Product Name' />
       </Grid>
       <Grid item md={4}  xs={12}>
-        <TextField xs={6} onChange={e => setPName(e.target)} name='price' value={products.price}  fullWidth label='Unit Price' placeholder='Unit Price' />
+        <TextField xs={6} onChange={e => setUnitPrice(e.target.value)} name='price' value={unitPrice}  fullWidth label='Unit Price' placeholder='Unit Price' type='number' />
       </Grid>
       <Grid item md={4}  xs={12}>
-        <TextField xs={6} onChange={e => setPName(e.target)} name='pqty' value={products.qty} fullWidth label='Quantity' placeholder='Quantity' />
+        <TextField xs={6} onChange={e => setQuantity(e.target.value)} name='pqty' value={quantity} fullWidth label='Quantity' placeholder='Quantity' type='number' />
       </Grid>
       <Grid item  xs={12}>
         <Button variant='contained' sx={{ mr: 2 }} onClick={addProductDom}>
