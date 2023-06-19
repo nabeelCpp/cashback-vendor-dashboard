@@ -96,7 +96,9 @@ const UserDropdown = props => {
           sx={{ width: 40, height: 40 }}
           src='/images/avatars/1.png'
         />
+       
       </Badge>
+      <Typography sx={{ fontWeight: 600 }}>{auth.user.name}</Typography>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

@@ -1,5 +1,7 @@
+import { useAuth } from 'src/hooks/useAuth'
+
 const routes = [
-   {
+  {
     icon: 'ri:dashboard-fill',
     title: 'Dashboard',
     path: '/dashboard'
@@ -32,8 +34,8 @@ const routes = [
   {
     icon: 'uis:signout',
     title: 'Sign Out',
-    
-  },
+    path: '/logout'
+  }
 ]
 
 export default routes
