@@ -89,6 +89,7 @@ const AuthProvider = ({ children }) => {
           username: response.username,
           email: response.email,
           name: `${response.first_name} ${response.last_name}`,
+          image: response.cmp_logo,
           role: 'ADMIN'
         }
         window.localStorage.setItem(authConfig.storageTokenKeyName, response.accessToken)

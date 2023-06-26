@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { DataGrid } from '@mui/x-data-grid'
 import Card from '@mui/material/Card'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
@@ -14,6 +14,17 @@ import { useAuth } from 'src/hooks/useAuth'
 
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CardContent from '@mui/material/CardContent'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 const Profile = () => {
   const auth = useAuth()
   const [profile, setProfile] = useState([])
@@ -38,6 +49,21 @@ const Profile = () => {
   const [cmpLogo, setCmpLogo] = useState('')
   const [uploadLogo, setUploadLogo] = useState(null)
   const [uploadGallery, setUploadGallery] = useState([])
+  const [scroll, setScroll] = useState('paper')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [id, setId] = useState(null)
+  
+  const [open, setOpen] = useState(false);
+  const descriptionElementRef = useRef(null);
+  useEffect(() => {
+    if (open) {
+      const { current: descriptionElement } = descriptionElementRef;
+      if (descriptionElement !== null) {
+        descriptionElement.focus();
+      }
+    }
+  }, [open]);
+  
   const loadProfile = () => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/profile`, {
       headers: {
@@ -81,12 +107,14 @@ const Profile = () => {
   const submitLogoHandler = () => {
     const formData = new FormData();
     formData.append('cmp_logo', uploadLogo);
+    setOpen(true)
     axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/logo/update`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         "Authorization": `Bearer ${localStorage.accessToken}`
       }
     }).then(resp => {
+      setOpen(false)
       let data = resp.data
       if(data.success){
         toast.success(data.message);
@@ -96,6 +124,7 @@ const Profile = () => {
       setCmpLogo(data.cmp_logo)
       setUploadLogo(null);
     }).catch(error => {
+      setOpen(false)
       toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
         if (error.response && error.response.status == 401) {
           auth.logout();
@@ -103,18 +132,28 @@ const Profile = () => {
     });
   }
 
+  const deleteItem = (id) => {
+    setId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const handleClose = () => {
+    setDeleteModalOpen(false)
+  }
+
   const galleryUploadHandler = () => {
     const formData = new FormData();
     for (let i = 0; i < uploadGallery.length; i++) {
       formData.append('gallery', uploadGallery[i]);
     }
-    console.log(formData.FileList);
+    setOpen(true)
     axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/gallery/update`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         "Authorization": `Bearer ${localStorage.accessToken}`
       }
     }).then(resp => {
+      setOpen(false)
       let data = resp.data
       if(data.success){
         toast.success(data.message);
@@ -124,11 +163,37 @@ const Profile = () => {
       setGallery(data.files)
       setUploadGallery([]);
     }).catch(error => {
+      setOpen(false)
       toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
         if (error.response && error.response.status == 401) {
           auth.logout();
         }
     });
+  }
+
+  const removeGallery = () => {
+    let parts = id.split('/').reverse()
+    
+    setOpen(true)
+    axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/gallery/remove/${parts[0]}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.accessToken}`
+      }
+    })
+      .then(response => {
+        setOpen(false)
+        setDeleteModalOpen(false)
+        toast.success(response.data.message)
+        setGallery(response.data.files)
+      })
+      .catch(error => {
+        setOpen(false)
+        setDeleteModalOpen(false)
+        toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
+        if (error.response && error.response.status == 401) {
+          auth.logout();
+        }
+      })
   }
 
   const handleLogoUpload = (event) => {
@@ -154,11 +219,13 @@ const Profile = () => {
       "telephone" : telephone,
       "description": description
     }
+    setOpen(true)
     axios.post(`${process.env.NEXT_PUBLIC_API_URL}/franchisepanel/profile/update`,dataToUpdate, {
       headers: {
         "Authorization": `Bearer ${localStorage.accessToken}`
       }
     }).then(resp => {
+      setOpen(false)
       let data = resp.data
       if(data.success){
         toast.success(data.message);
@@ -166,6 +233,7 @@ const Profile = () => {
         toast.error(data.message)
       }
     }).catch(error => {
+      setOpen(false)
       toast.error(`${error.response? error.response.status:''}: ${error.response?error.response.data.message:error}`);
         if (error.response && error.response.status == 401) {
           auth.logout();
@@ -266,7 +334,7 @@ const Profile = () => {
 
 
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Box
           sx={{
             py: 3,
@@ -305,7 +373,7 @@ const Profile = () => {
         <Button variant='contained' onClick={updateBankInfo} sx={{ mr: 2 }}>
           Update Bank Info
         </Button>
-      </Grid>
+      </Grid> */}
 
 
       <Grid  item md={9} xs={12}>
@@ -360,6 +428,19 @@ const Profile = () => {
                   alt={item}
                   loading="lazy"
                 />
+
+                {gallery.length > 1 && (
+                  <ImageListItemBar
+                    actionIcon={
+                      <IconButton
+                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                        aria-label={`Remove gallery item ${item}`}
+                      >
+                        <DeleteForeverIcon onClick={() => deleteItem(item)}  />
+                      </IconButton>
+                    }
+                  />
+                )}
               </ImageListItem>
             )):'No gallery found!'}
           </ImageList>
@@ -367,6 +448,7 @@ const Profile = () => {
             Upload Gallery Image/s
             <input hidden accept='image/*' multiple type='file' onChange={handleGalleryUpload} />
           </Button>
+          {uploadGallery.length} Files selected
           {/* {uploadGallery.map((file) => (
             (
               <ImageList sx={{ width: 500, height: 200 }} cols={3} rowHeight={164}>
@@ -388,7 +470,44 @@ const Profile = () => {
         </Button>
       </Grid>
     </Grid>
-      
+    <div>
+      <Dialog
+        open={deleteModalOpen}
+        onClose={handleClose}
+        scroll={scroll}
+        aria-labelledby="scroll-dialog-title"
+        aria-describedby="scroll-dialog-description"
+      >
+        <DialogTitle id="scroll-dialog-title">Delete Gallery Item</DialogTitle>
+        <DialogContent dividers={scroll === 'paper'}>
+          <DialogContentText
+            id="scroll-dialog-description"
+            ref={descriptionElementRef}
+            tabIndex={-1}
+          >
+            <Card component='div' sx={{ position: 'relative', mb: 7 }}>
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                  <Typography>
+                    Are you sure? This action can't be undone
+                  </Typography>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>No</Button>
+          <Button onClick={removeGallery}>Yes</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+    
+    <Backdrop sx={{ color: '#fff', zIndex: 10000000 }} open={open}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     
     </>
   )
