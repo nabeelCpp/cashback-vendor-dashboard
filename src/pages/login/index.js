@@ -15,7 +15,7 @@ import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
-
+import Card from '@mui/material/Card'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -140,26 +140,10 @@ const LoginPage = () => {
   const imageSource = skin === 'bordered' ? 'create-deal-review-complete' : 'create-deal-review-complete'
 
   return (
-    <Box className='content-right'>
-      {!hidden ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transform: 'scaleX(-1)'
-          }}
-        >
-          <LoginIllustrationWrapper>
-            <LoginIllustration alt='login-illustration' src={`/images/pages/${imageSource}.png`} />
-          </LoginIllustrationWrapper>
-          <FooterIllustrationsV2 />
-        </Box>
-      ) : null}
+    <Box sx={{ overflow: 'auto' }} className='content-center cloudbg'>
+    
       <RightWrapper sx={skin === 'bordered' && !hidden ? { borderLeft: `1px solid ${theme.palette.divider}` } : {}}>
-        <Box
+      <Card
           sx={{
             p: 7,
             height: '100%',
@@ -170,20 +154,19 @@ const LoginPage = () => {
           }}
         >
           <BoxWrapper>
+            
+            <Box sx={{ mb: 6 }}>
             <Box
               sx={{
-                top: 30,
-                left: 40,
                 display: 'flex',
-                position: 'absolute',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                my: 6
               }}
             >
               <img src='/images/logo.png' style={{ width: 150, objectFit: 'cover' }} />
             </Box>
-            <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant='h5'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</TypographyStyled>
+              <TypographyStyled variant='h5'>{`Welcome to Vendor Dashboard`}</TypographyStyled>
               <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
             </Box>
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
@@ -249,7 +232,7 @@ const LoginPage = () => {
               </Button>
             </form>
           </BoxWrapper>
-        </Box>
+        </Card>
       </RightWrapper>
     </Box>
   )

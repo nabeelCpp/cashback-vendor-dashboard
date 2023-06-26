@@ -166,7 +166,7 @@ const DueRequest = () => {
       sortDirections={sorter}
       pagination={
         history?.length > 0
-          ? {
+          ? {      
               defaultCurrent: 1,
               total: history?.length,
               defaultPageSize: 10,
