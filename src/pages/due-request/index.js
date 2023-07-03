@@ -123,7 +123,7 @@ const DueRequest = () => {
       sorter: (a, b) => a.payment_mode.localeCompare(b.payment_mode),
     },
     {
-      title: 'Start Date',
+      title: 'Request Date',
       dataIndex: 'posted_date',
       width: 150,
       render: (text, record) => new Date(record.posted_date).toLocaleDateString(),
